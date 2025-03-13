@@ -1,0 +1,39 @@
+{
+  "name": "toad-ui",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@ai-sdk/openai": "~1.0.4",
+    "@ai-sdk/openai-compatible": "^0.1.14",
+    "@ai-sdk/react": "^1.1.21",
+    "@goat-sdk/adapter-vercel-ai": "0.2.9",
+    "@goat-sdk/core": "0.4.8",
+    "@goat-sdk/wallet-viem": "0.2.11",
+    "ai": "~4.0.22",
+    "dotenv": "^16.4.5",
+    "marked": "^15.0.7",
+    "next": "15.2.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-markdown": "^10.1.0",
+    "viem": "2.23.4",
+    "zod": "3.23.8"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.2.1",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}

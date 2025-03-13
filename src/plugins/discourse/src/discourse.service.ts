@@ -1,4 +1,3 @@
-import { WalletClientBase } from "@goat-sdk/core";
 import { getDiscourseSearchParameters, getLatestPostsParameters, getPostParameters, getPostRepliesParameters } from "./parameters";
 import { DiscourseApi } from "./api";
 

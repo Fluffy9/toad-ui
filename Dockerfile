@@ -6,10 +6,10 @@ WORKDIR /app
 RUN apk add --no-cache libc6-compat
 
 # Copy package files
-COPY package.json package-lock.json* ./
+COPY package.json ./
 
 # Install dependencies with strict production mode
-RUN npm ci --only=production
+RUN npm install --omit=dev
 
 # Stage 2: Builder
 FROM node:20-alpine AS builder
@@ -18,8 +18,13 @@ WORKDIR /app
 # Install additional dependencies for builds
 RUN apk add --no-cache libc6-compat
 
-# Copy dependencies from deps stage
-COPY --from=deps /app/node_modules ./node_modules
+# Copy package files
+COPY package.json ./
+
+# Install ALL dependencies (including dev) for build
+RUN npm install
+
+# Copy source files and config files
 COPY . .
 
 # Set environment to production
@@ -58,8 +63,8 @@ USER nextjs
 # Expose port
 EXPOSE 3000
 
-ENV PORT 3000
-ENV HOSTNAME "0.0.0.0"
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
@@ -67,15 +72,3 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
 
 # Start the application
 CMD ["node", "server.js"]
-
-FROM node:18-alpine as base
-RUN apk add --no-cache g++ make py3-pip libc6-compat
-WORKDIR /app
-COPY package*.json ./
-EXPOSE 3000
-
-FROM base as dev
-ENV NODE_ENV=development
-RUN npm install 
-COPY . .
-CMD npm run dev

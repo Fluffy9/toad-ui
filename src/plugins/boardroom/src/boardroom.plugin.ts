@@ -1,7 +1,6 @@
-import { createTool, PluginBase, WalletClientBase } from "@goat-sdk/core";
+import { createTool, PluginBase } from "@goat-sdk/core";
 import { BoardroomService } from "./boardroom.service";
 import { BoardroomApi } from "./api";
-import { z } from "zod";
 import {
     getDiscourseTopicsParameters,
     getDiscourseCategoriesParameters,
@@ -26,7 +25,7 @@ export class BoardroomPlugin extends PluginBase {
     }
 
     supportsChain = () => true;
-    getTools(walletClient: WalletClientBase) {
+    getTools() {
         return [
             createTool({
                 name: "boardroom_getDiscourseTopics",

@@ -3,7 +3,7 @@ export class DiscourseApi {
     constructor(private readonly apiKey: string, private readonly apiUsername: string, private readonly baseUrl: string) {}
 
     async makeRequest(path: string, options: RequestInit = {}) {
-        let query = new URL(`${this.baseUrl}${path}`);
+        const query = new URL(`${this.baseUrl}${path}`);
         console.log(query.toString());
         const response = await fetch(query, {
             ...options,
@@ -18,7 +18,7 @@ export class DiscourseApi {
             }
             throw new Error(`Discourse API request failed: ${response.statusText}`);
         }
-        let res = await response.json();
+        const res = await response.json();
         return res;
     }
 

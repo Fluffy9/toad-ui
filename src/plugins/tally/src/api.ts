@@ -1,10 +1,10 @@
 export class TallyApi {
     public readonly baseUrl = "https://api.tally.xyz/query";
-    
-    constructor(private readonly apiKey: string, public readonly organizationName: string, public readonly chainId: string) {}
 
-    async makeRequest(data: {query: string, operationName: string, variables: any}, options: RequestInit = {}) {
-        let query = new URL(`${this.baseUrl}`);
+    constructor(private readonly apiKey: string, public readonly organizationName: string, public readonly chainId: string) { }
+
+    async makeRequest(data: { query: string, operationName: string, variables: unknown}, options: RequestInit = {}) {
+        const query = new URL(`${this.baseUrl}`);
         const response = await fetch(query, {
             method: "POST",
             ...options,
@@ -13,7 +13,7 @@ export class TallyApi {
                 "Api-Key": this.apiKey,
                 ...options.headers,
             },
-            body: JSON.stringify({query: data.query, operationName: data.operationName, variables: data.variables}),
+            body: JSON.stringify({ query: data.query, operationName: data.operationName, variables: data.variables }),
         });
 
         if (!response.ok) {

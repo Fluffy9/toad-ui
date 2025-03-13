@@ -1,11 +1,5 @@
-import { Tool } from "@goat-sdk/core";
 import { BoardroomApi } from "./api";
 import { 
-    getAllProposalsForProtocolParameters, 
-    getAllProtocolsParameters, 
-    getSingleProtocolParameters,
-    getProposalsAcrossAllProtocolsParameters,
-    getSingleProposalParameters,
     getPendingVotesByAddressParameters,
     getAllVotersForAProtocolParameters,
     getDiscourseTopicsParameters,

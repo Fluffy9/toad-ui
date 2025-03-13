@@ -1,7 +1,6 @@
-import { createTool, PluginBase, WalletClientBase } from "@goat-sdk/core";
+import { createTool, PluginBase } from "@goat-sdk/core";
 import { DiscourseService } from "./discourse.service";
 import { DiscourseApi } from "./api";
-import { z } from "zod";
 import {
     getDiscourseSearchParameters,
     getLatestPostsParameters,
@@ -25,7 +24,7 @@ export class DiscoursePlugin extends PluginBase {
     }
 
     supportsChain = () => true;
-    getTools(walletClient: WalletClientBase) {
+    getTools() {
         return [
             createTool({
                 name: "discourse_getDiscourseSearch",

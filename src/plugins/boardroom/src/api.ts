@@ -4,7 +4,7 @@ export class BoardroomApi {
     constructor(private readonly apiKey: string) {}
 
     async makeRequest(path: string, options: RequestInit = {}) {
-        let query = new URL(`${this.baseUrl}${path}`);
+        const query = new URL(`${this.baseUrl}${path}`);
         query.searchParams.append("key", this.apiKey);
         console.log(query.toString());
         const response = await fetch(query, {

@@ -1,7 +1,5 @@
-import { createTool, PluginBase, WalletClientBase } from "@goat-sdk/core";
+import { createTool, PluginBase } from "@goat-sdk/core";
 import { TallyService } from "./tally.service";
-import { TallyApi } from "./api";
-import { z } from "zod";
 import {
     getAllProposalsParameters,
     getProposalByIdParameters,
@@ -18,13 +16,13 @@ export class TallyPlugin extends PluginBase {
     private tallyService: TallyService;
 
     constructor(options: TallyOptions) {
-        const service = new TallyService(new TallyApi(options.apiKey, options.organizationName, options.chainId));
+        const service = new TallyService(options.apiKey, options.organizationName, options.chainId);
         super("tally", [service]);
         this.tallyService = service;
     }
 
     supportsChain = () => true;
-    getTools(walletClient: WalletClientBase) {
+    getTools() {
         return [
             createTool({
                 name: "tally_proposals",

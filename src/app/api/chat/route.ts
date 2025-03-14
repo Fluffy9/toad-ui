@@ -55,7 +55,7 @@ export async function POST(req: Request) {
         });
         console.log("OpenAI Compatible Provider Response - ", response['status']);
         if (response['status'] != 200) {
-            console.log("OpenAI Compatible Provider Response - ", result);
+            console.log("OpenAI Compatible Provider Response - ", response);
             throw new Error('Failed to connect to model provider');
         }
     }

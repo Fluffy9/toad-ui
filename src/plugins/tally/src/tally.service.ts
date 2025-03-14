@@ -5,8 +5,7 @@ import { organizationQuery, proposalsQuery, proposalQuery } from "./constants";
 
 interface Organization {
     id: string;
-    name: string;
-    proposalCount: number;
+    governorIds: string[];
 }
 
 export class TallyService {
@@ -39,7 +38,7 @@ export class TallyService {
             query: proposalsQuery,
             operationName: "Proposals",
             variables: {
-                governorId:this.organization.governorIds[0],
+                governorId:this.organization?.governorIds[0],
                 sort: {sortBy: "id", isDescending: parameters.isDescending},
                 page: {limit: parameters.limit},
                 afterCursor: parameters.afterCursor,
@@ -66,7 +65,7 @@ export class TallyService {
     }
 
     async getProposalByName(parameters: getProposalByNameParameters) {
-
+        console.log("getProposalByName: ", parameters);
         return "You can only request Tally proposals by id. Try using the getProposalById method.";
     }
 }

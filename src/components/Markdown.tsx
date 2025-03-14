@@ -1,11 +1,6 @@
-import { marked } from 'marked';
-import { memo, useMemo } from 'react';
+import { memo } from 'react';
 import ReactMarkdown from 'react-markdown';
 
-function parseMarkdownIntoBlocks(markdown: string): string[] {
-  const tokens = marked.lexer(markdown);
-  return tokens.map(token => token.raw);
-}
 
 const MarkdownBlock = memo(
   ({ content }: { content: string }) => {

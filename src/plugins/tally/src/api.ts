@@ -17,7 +17,7 @@ export class TallyApi {
         });
 
         if (!response.ok) {
-            let result = await response.json();
+            const result = await response.json();
             console.log("Tally API response: ", result);
             if (response.status === 429) {
                 console.log("Tally API rate limit exceeded");

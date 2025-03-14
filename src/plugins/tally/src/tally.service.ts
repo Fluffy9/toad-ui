@@ -2,23 +2,6 @@ import { TallyApi } from "./api";
 import { getAllProposalsParameters, getProposalByIdParameters, getProposalByNameParameters } from "./parameters";
 import { organizationQuery, proposalsQuery, proposalQuery } from "./constants";
 
-interface Proposal {
-    id: string;
-    governor: {
-        id: string;
-        name: string;
-    };
-    metadata: {
-        title: string;
-        description: string;
-    };
-    votingStats: {
-        forVotes: string;
-        againstVotes: string;
-        abstainVotes: string;
-    };
-    status: string;
-}
 
 interface Organization {
     id: string;
@@ -34,17 +17,21 @@ export class TallyService {
         this.tallyApi = new TallyApi(apiKey, organizationName, chainId);
     }
 
-    async getOrganization(): Promise<Organization> {
+    async getOrganization() {
         const organizationQueryData = {
             query: organizationQuery,
             operationName: "Organization",
-            variables: {}
+            variables: {            
+                input: {
+                    slug: this.tallyApi.organizationName.toLowerCase()
+                }
+            }        
         }
         const organizationResponse = await this.tallyApi.makeRequest(organizationQueryData);
-        return organizationResponse.data.organization;
+        return organizationResponse.organization;
     }
 
-    async getAllProposals(parameters: getAllProposalsParameters): Promise<Proposal[]> {
+    async getAllProposals(parameters: getAllProposalsParameters) {
         if (!this.organization) {
             this.organization = await this.getOrganization();
         }
@@ -52,17 +39,18 @@ export class TallyService {
             query: proposalsQuery,
             operationName: "Proposals",
             variables: {
-                input: {
-                    organizationId: this.organization?.id,
-                    ...parameters
-                }
+                governorId:this.organization.governorIds[0],
+                sort: {sortBy: "id", isDescending: parameters.isDescending},
+                page: {limit: parameters.limit},
+                afterCursor: parameters.afterCursor,
             }
         }
+        console.log("proposalsQueryData: ", JSON.stringify(proposalsQueryData));
         const proposalsResponse = await this.tallyApi.makeRequest(proposalsQueryData);
-        return proposalsResponse?.data?.proposals || [];
+        return proposalsResponse || [];
     }
 
-    async getProposalById(parameters: getProposalByIdParameters): Promise<Proposal | null> {
+    async getProposalById(parameters: getProposalByIdParameters) {
         if (!this.organization) {
             this.organization = await this.getOrganization();
         }
@@ -74,20 +62,11 @@ export class TallyService {
             }
         }
         const proposalResponse = await this.tallyApi.makeRequest(proposalQueryData);
-        return proposalResponse?.data?.proposal || null;
+        return proposalResponse || null;
     }
 
-    async getProposalByName(parameters: getProposalByNameParameters): Promise<Proposal | null> {
-        if (!this.organization) {
-            this.organization = await this.getOrganization();
-        }
-        // Since Tally API doesn't support querying by name, we'll fetch all proposals and filter
-        const proposals = await this.getAllProposals({
-            organization: this.organization.name,
-            isDescending: false,
-            limit: 100,
-            afterCursor: ""
-        });
-        return proposals.find(p => p.metadata.title.toLowerCase().includes(parameters.name.toLowerCase())) || null;
+    async getProposalByName(parameters: getProposalByNameParameters) {
+
+        return "You can only request Tally proposals by id. Try using the getProposalById method.";
     }
 }

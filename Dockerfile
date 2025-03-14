@@ -24,7 +24,7 @@ COPY package.json ./
 # Install ALL dependencies (including dev) for build
 RUN npm install
 
-# Copy source files and config files
+# Copy source files
 COPY . .
 
 # Set environment to production

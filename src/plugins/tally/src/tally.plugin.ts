@@ -29,7 +29,7 @@ export class TallyPlugin extends PluginBase {
                 description: "Fetches a list of proposals for the current governance organization from Tally",
                 parameters: getAllProposalsParameters.schema,
             }, async (parameters) => {
-                return this.tallyService.getAllProposals(parameters);
+                return await this.tallyService.getAllProposals(parameters);
             }),
 
             createTool({
@@ -37,7 +37,7 @@ export class TallyPlugin extends PluginBase {
                 description: "Fetches details of a proposal for the current governance organization by id from Tally",
                 parameters: getProposalByIdParameters.schema,
             }, async (parameters) => {
-                return this.tallyService.getProposalById(parameters);
+                return await this.tallyService.getProposalById(parameters);
             }),
 
             createTool({

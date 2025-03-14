@@ -1,6 +1,7 @@
 import { openai } from '@ai-sdk/openai';
+import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
 
-import { streamText } from 'ai';
+import { LanguageModelV1, streamText } from 'ai';
 
 import { tally } from "../../../plugins/tally/src";
 import { discourse } from "../../../plugins/discourse/src";
@@ -40,6 +41,37 @@ export async function POST(req: Request) {
         transport: http(process.env.RPC_PROVIDER_URL),
         chain: polygon,
     });
+    let provider = null;
+    if (process.env.OPENAI_BASE_URL && process.env.OPENAI_MODEL) {
+        provider = createOpenAICompatible({
+            name: 'compatible',
+            apiKey: process.env.OPENAI_API_KEY as string,
+            baseURL: process.env.OPENAI_BASE_URL as string
+        });
+        const response = await fetch(`${process.env.OPENAI_BASE_URL}/v1/models`, {
+            headers: {
+                'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+            },
+        });
+        console.log("OpenAI Compatible Provider Response - ", response['status']);
+        if (response['status'] != 200) {
+            console.log("OpenAI Compatible Provider Response - ", result);
+            throw new Error('Failed to connect to model provider');
+        }
+    }
+    else {
+        const response = await fetch(`https://api.openai.com/v1/models`, {
+            headers: {
+                'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+            },
+        });
+        console.log("OpenAI Provider Response - ", response['status']);
+        if (response['status'] != 200) {
+            console.log("OpenAI Provider Response - ", response);
+            throw new Error('Failed to connect to openai');
+        }
+    }
+    const model = provider ? provider(process.env.OPENAI_MODEL as string) : openai(process.env.OPENAI_MODEL || 'gpt-4o-mini');
 
     // Initialize tools
     const tools = await getOnChainTools({
@@ -60,16 +92,17 @@ export async function POST(req: Request) {
 
     console.log("thinking...");
 
+
     // Stream the response from the OpenAI API
     const result = streamText({
-        model: openai('gpt-4o-mini'),
+        model: model as LanguageModelV1,
         tools: tools,
         maxSteps: 10,
         system: `You are a helpful assistant that can answer questions about the governance organization: ${process.env.GOVERNANCE_ORGANIZATION_NAME}.`,
         messages,
         onStepFinish: (event) => {
-            console.log(event.toolResults);
-        }
+            console.log(event.text);
+        },
     });
 
     return result.toDataStreamResponse();

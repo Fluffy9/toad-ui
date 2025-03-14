@@ -19,14 +19,17 @@ const MarkdownBlock = memo(
 
 MarkdownBlock.displayName = 'MarkdownBlock';
 
-export const Markdown = memo(
-  ({ content, id }: { content: string; id: string }) => {
-    const blocks = useMemo(() => parseMarkdownIntoBlocks(content), [content]);
+interface MarkdownProps {
+  content: string;
+  id: string;
+}
 
-    return blocks.map((block, index) => (
-      <MarkdownBlock content={block} key={`${id}-block_${index}`} />
-    ));
-  },
-);
+export function Markdown({ content }: MarkdownProps) {
+  return (
+    <div className="prose prose-sm dark:prose-invert max-w-none">
+      <ReactMarkdown>{content}</ReactMarkdown>
+    </div>
+  );
+}
 
 Markdown.displayName = 'Markdown';

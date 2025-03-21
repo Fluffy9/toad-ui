@@ -1,11 +1,24 @@
 import "@/styles/globals.css";
-import { AppProps } from 'next/app';
+import '@rainbow-me/rainbowkit/styles.css';
+import { RainbowKitProvider } from '@rainbow-me/rainbowkit';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { config, queryClient } from '../config/wagmi';
+import type { AppProps } from 'next/app';
+import { WagmiProvider } from 'wagmi';
 import { AppProvider } from '@/context/AppContext';
 
-export default function App({ Component, pageProps }: AppProps) {
+function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <AppProvider>
-      <Component {...pageProps} />
-    </AppProvider>
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        <RainbowKitProvider>
+          <AppProvider>
+            <Component {...pageProps} />
+          </AppProvider>
+        </RainbowKitProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
   );
 }
+
+export default MyApp;

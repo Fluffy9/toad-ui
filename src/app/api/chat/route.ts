@@ -14,18 +14,7 @@ import { privateKeyToAccount } from 'viem/accounts';
 import dotenv from 'dotenv'
 dotenv.config()
 
-/*
-✅- Should know about the current organization
-✅- ask to get the list of proposals
-    Use Tally to fetch a list of proposals for the current governance organization
-✅- ask for the details of each proposal
-    Use Tally to fetch the details of each proposal
-✅- ask for a summary of the discussions for each proposal
-    Use Discourse to fetch a summary of the discussions for each proposal
-✅- ask questions about the proposals in general
-⬜- ask TOAD about it's decision and the reasoning behind it for each proposal
-    Fetch the decision from the smart contract and come up with a justification for the decision using proposal summary and forum information
-*/
+
 
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;

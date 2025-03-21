@@ -2,6 +2,7 @@ import { useChat } from '@ai-sdk/react';
 import { Navigation } from '@/components/Navigation';
 import { Chat } from '@/components/Chat';
 import { useApp } from '@/context/AppContext';
+import { MemberGate } from '@/components/MemberGate';
 
 export default function Home() {
   const { isLoading, setIsLoading, error, setError, clearError } = useApp();
@@ -50,14 +51,15 @@ export default function Home() {
           <span className="block sm:inline">{error}</span>
         </div>
       )}
-      <Chat
-        messages={messages}
-        input={input}
-        isLoading={isLoading}
-        onSubmit={onSubmit}
-        onInputChange={handleInputChange}
-      />
+      <MemberGate>
+        <Chat
+          messages={messages}
+          input={input}
+          isLoading={isLoading}
+          onSubmit={onSubmit}
+          onInputChange={handleInputChange}
+        />
+      </MemberGate>
     </div>
-
   );
 }

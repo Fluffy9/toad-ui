@@ -1,32 +1,39 @@
-import { optimism, polygon, arbitrum } from 'wagmi/chains';
+import { optimism, polygon, arbitrum, sepolia } from 'wagmi/chains';
 import { useChainId, useSwitchChain } from 'wagmi';
 import { useState } from 'react';
 
 const chainLogos = {
     [optimism.id]: (
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#FF0420" />
-            <path d="M2 17L12 22L22 17" stroke="#FF0420" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M2 12L12 17L22 12" stroke="#FF0420" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="rgb(255, 4, 32)" />
+            <path d="M2 17L12 22L22 17" stroke="rgb(255, 4, 32)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M2 12L12 17L22 12" stroke="rgb(255, 4, 32)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
     ),
     [polygon.id]: (
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#8247E5" />
-            <path d="M2 17L12 22L22 17" stroke="#8247E5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M2 12L12 17L22 12" stroke="#8247E5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="rgb(130, 71, 229)" />
+            <path d="M2 17L12 22L22 17" stroke="rgb(130, 71, 229)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M2 12L12 17L22 12" stroke="rgb(130, 71, 229)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
     ),
     [arbitrum.id]: (
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#28A0F0" />
-            <path d="M2 17L12 22L22 17" stroke="#28A0F0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M2 12L12 17L22 12" stroke="#28A0F0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="rgb(40, 160, 240)" />
+            <path d="M2 17L12 22L22 17" stroke="rgb(40, 160, 240)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M2 12L12 17L22 12" stroke="rgb(40, 160, 240)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+    ),
+    [sepolia.id]: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="rgb(128, 128, 128)" />
+            <path d="M2 17L12 22L22 17" stroke="rgb(128, 128, 128)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M2 12L12 17L22 12" stroke="rgb(128, 128, 128)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
     ),
 };
 
-const supportedChains = [optimism, polygon, arbitrum];
+const supportedChains = [optimism, polygon, arbitrum, sepolia];
 
 export function ChainSelector() {
     const [isOpen, setIsOpen] = useState(false);
@@ -43,9 +50,9 @@ export function ChainSelector() {
             >
                 {isSupported ? chainLogos[currentChain.id] : (
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#FF0000" />
-                        <path d="M2 17L12 22L22 17" stroke="#FF0000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                        <path d="M2 12L12 17L22 12" stroke="#FF0000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="rgb(255, 0, 0)" />
+                        <path d="M2 17L12 22L22 17" stroke="rgb(255, 0, 0)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M2 12L12 17L22 12" stroke="rgb(255, 0, 0)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                 )}
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-200">

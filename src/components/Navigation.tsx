@@ -1,10 +1,53 @@
 import React, { useState } from "react";
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { ChainSelector } from './ChainSelector';
+import { useAccount, useWriteContract, useReadContract } from 'wagmi';
+import ERC20Votes_ABI from '../../public/abi/ERC20Votes.json';
+import { apiKeys, contracts, urls,  } from '@/config/constants';
+
 
 export function Navigation() {
+    if (!contracts.governance) {
+        throw new Error('Required environment variables are not set');
+    }
+
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const { address } = useAccount();
+    const { writeContract } = useWriteContract();
+    const { data: currentDelegate } = useReadContract({
+        address: contracts.governance,
+        abi: ERC20Votes_ABI.abi,
+        functionName: 'delegates',
+        args: address ? [address] : undefined,
+        query: {
+            enabled: !!address
+        }
+    });
+
+    const handleDelegate = () => {
+        if (address) {
+            writeContract({
+                address: contracts.governance,
+                abi: ERC20Votes_ABI.abi,
+                functionName: 'delegate',
+                args: [address],
+            });
+        }
+    };
+
+    const renderDelegateButton = () => {
+        if (!address || currentDelegate === address) return null;
+
+        return (
+            <button
+                onClick={handleDelegate}
+                className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800"
+                role="menuitem"
+            >
+                Delegate to TOAD
+            </button>
+        );
+    };
 
     return (
         <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 sm:px-6 py-4 bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800">
@@ -32,14 +75,24 @@ export function Navigation() {
                 {isDropdownOpen && (
                     <div className="hidden sm:block absolute top-full left-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-zinc-900 ring-1 ring-black ring-opacity-5 dark:ring-white dark:ring-opacity-10">
                         <div className="py-1" role="menu" aria-orientation="vertical">
-                            <a href="#" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800" role="menuitem">
-                                Dashboard
+                            {renderDelegateButton()}
+                            <a
+                                href={apiKeys.tally}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800"
+                                role="menuitem"
+                            >
+                                View on Tally
                             </a>
-                            <a href="#" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800" role="menuitem">
-                                Settings
-                            </a>
-                            <a href="#" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800" role="menuitem">
-                                Help Center
+                            <a
+                                href={urls.discourse}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800"
+                                role="menuitem"
+                            >
+                                Forum
                             </a>
                         </div>
                     </div>
@@ -67,124 +120,32 @@ export function Navigation() {
 
             {/* Desktop Buttons */}
             <div className="hidden sm:flex items-center space-x-4">
-                <ChainSelector />
-                <ConnectButton.Custom>
-                    {({
-                        account,
-                        chain,
-                        openAccountModal,
-                        openChainModal,
-                        openConnectModal,
-                        mounted,
-                    }) => {
-                        const ready = mounted;
-                        const connected = ready && account && chain;
-
-                        return (
-                            <div
-                                {...(!ready && {
-                                    'aria-hidden': true,
-                                    'style': {
-                                        opacity: 0,
-                                        pointerEvents: 'none',
-                                        userSelect: 'none',
-                                    },
-                                })}
-                            >
-                                {(() => {
-                                    if (!connected) {
-                                        return (
-                                            <button
-                                                onClick={openConnectModal}
-                                                className="px-4 py-2 shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-700 rounded-md hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors"
-                                            >
-                                                Connect Wallet
-                                            </button>
-                                        );
-                                    }
-
-                                    return (
-                                        <button
-                                            onClick={openAccountModal}
-                                            className="px-4 py-2 shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-700 rounded-md hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors"
-                                        >
-                                            {account.displayName}
-                                            {account.displayBalance ? ` (${account.displayBalance})` : ''}
-                                        </button>
-                                    );
-                                })()}
-                            </div>
-                        );
-                    }}
-                </ConnectButton.Custom>
+                <ConnectButton />
             </div>
 
             {/* Mobile Menu */}
             {isMobileMenuOpen && (
                 <div className="sm:hidden absolute top-full left-0 right-0 bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800">
                     <div className="px-4 py-3 space-y-3">
-                        <a href="#" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-md">
-                            Dashboard
+                        {renderDelegateButton()}
+                        <a
+                            href={urls.tally}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-md"
+                        >
+                            View on Tally
                         </a>
-                        <a href="#" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-md">
-                            Settings
+                        <a
+                            href={urls.discourse}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-md"
+                        >
+                            Forum
                         </a>
-                        <a href="#" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-md">
-                            Help Center
-                        </a>
-                        <div className="pt-2 border-t border-gray-200 dark:border-zinc-700">
-                            <ChainSelector />
-                        </div>
                         <div>
-                            <ConnectButton.Custom>
-                                {({
-                                    account,
-                                    chain,
-                                    openAccountModal,
-                                    openChainModal,
-                                    openConnectModal,
-                                    mounted,
-                                }) => {
-                                    const ready = mounted;
-                                    const connected = ready && account && chain;
-
-                                    return (
-                                        <div
-                                            {...(!ready && {
-                                                'aria-hidden': true,
-                                                'style': {
-                                                    opacity: 0,
-                                                    pointerEvents: 'none',
-                                                    userSelect: 'none',
-                                                },
-                                            })}
-                                        >
-                                            {(() => {
-                                                if (!connected) {
-                                                    return (
-                                                        <button
-                                                            onClick={openConnectModal}
-                                                            className="w-full px-4 py-2 shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-700 rounded-md hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors"
-                                                        >
-                                                            Connect Wallet
-                                                        </button>
-                                                    );
-                                                }
-
-                                                return (
-                                                    <button
-                                                        onClick={openAccountModal}
-                                                        className="w-full px-4 py-2 shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-700 rounded-md hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors"
-                                                    >
-                                                        {account.displayName}
-                                                        {account.displayBalance ? ` (${account.displayBalance})` : ''}
-                                                    </button>
-                                                );
-                                            })()}
-                                        </div>
-                                    );
-                                }}
-                            </ConnectButton.Custom>
+                            <ConnectButton />
                         </div>
                     </div>
                 </div>

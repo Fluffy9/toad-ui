@@ -1,25 +1,12 @@
-import { getDefaultWallets } from '@rainbow-me/rainbowkit';
-import { createConfig, http } from 'wagmi';
-import { optimism, polygon, arbitrum } from 'wagmi/chains';
+import { getDefaultConfig } from '@rainbow-me/rainbowkit';
+import { optimism, polygon, arbitrum, sepolia } from 'wagmi/chains';
+import { apiKeys } from './constants';
 import { QueryClient } from '@tanstack/react-query';
 
-const projectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || '';
-
-const chains = [optimism, polygon, arbitrum] as const;
-
-const { connectors } = getDefaultWallets({
-    appName: 'TOAD UI',
-    projectId,
+export const config = getDefaultConfig({
+    appName: 'TOAD',
+    projectId: apiKeys.walletConnect,
+    chains: [optimism, polygon, arbitrum, sepolia],
 });
 
-export const queryClient = new QueryClient();
-
-export const config = createConfig({
-    chains,
-    transports: {
-        [optimism.id]: http(),
-        [polygon.id]: http(),
-        [arbitrum.id]: http(),
-    },
-    connectors,
-}); 
+export const queryClient = new QueryClient(); 

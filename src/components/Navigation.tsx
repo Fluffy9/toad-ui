@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount, useWriteContract, useReadContract } from 'wagmi';
 import ERC20Votes_ABI from '../../public/abi/ERC20Votes.json';
-import { apiKeys, contracts, urls,  } from '@/config/constants';
+import { apiKeys, contracts, urls, } from '@/config/constants';
 
 
 export function Navigation() {
@@ -30,7 +30,7 @@ export function Navigation() {
                 address: contracts.governance,
                 abi: ERC20Votes_ABI.abi,
                 functionName: 'delegate',
-                args: [address],
+                args: [contracts.toad],
             });
         }
     };

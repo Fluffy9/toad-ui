@@ -1,6 +1,6 @@
 export class DiscourseApi {
 
-    constructor(private readonly apiKey: string, private readonly apiUsername: string, private readonly baseUrl: string) {}
+    constructor(private readonly apiKey: string, private readonly apiUsername: string, private readonly baseUrl: string) { }
 
     async makeRequest(path: string, options: RequestInit = {}) {
         const query = new URL(`${this.baseUrl}${path}`);

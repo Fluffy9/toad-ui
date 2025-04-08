@@ -4,6 +4,7 @@ import { optimism, polygon, arbitrum, sepolia } from 'wagmi/chains';
 import TOAD_ABI from '../../public/abi/TOAD.json';
 import ReactMarkdown from 'react-markdown';
 import { contracts } from '../config/constants';
+import React from 'react';
 
 const welcomeMessage = `# Welcome to TOAD 🐸
 
@@ -39,6 +40,13 @@ export function MemberGate({ children }: { children: React.ReactNode }) {
             enabled: !!address && !!contracts.toad
         }
     });
+
+    // Log contract read failures
+    React.useEffect(() => {
+        if (error && !error.message.includes('revert')) {
+            console.error('Contract read failed:', error);
+        }
+    }, [error]);
 
     const supportedNetworks = [optimism, polygon, arbitrum, sepolia];
     const isSupportedNetwork = supportedNetworks.some(chain => chain.id === chainId);

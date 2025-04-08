@@ -43,7 +43,7 @@ export const discourseConfig = {
 
 // URLs and External Services
 export const urls = {
-    tally: `https://www.tally.xyz/gov/${process.env.NEXT_PUBLIC_GOVERNANCE_ORGANIZATION_NAME}`,
+    tally: `https://www.tally.xyz/gov/${process.env.GOVERNANCE_ORGANIZATION_NAME}`,
     discourse: process.env.NEXT_PUBLIC_DISCOURSE_BASE_URL,
 } as const;
 

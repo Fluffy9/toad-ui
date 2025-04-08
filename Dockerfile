@@ -1,17 +1,19 @@
-FROM node:20-alpine
+FROM node:20.11.1-alpine
 
 # Set working directory
 WORKDIR /app
 
-# Install curl for health check
-RUN apk add --no-cache curl
+# Install curl for health check and pnpm
+RUN apk add --no-cache curl && \
+    npm install -g pnpm@9.5.0 && \
+    mkdir -p /root/.local/share/pnpm/store
 
 # Copy package files
-COPY package*.json ./
+COPY package.json pnpm-lock.yaml ./
 
-# Install dependencies
-RUN npm install
-
+# Install dependencies and update lockfile
+RUN pnpm install --no-frozen-lockfile
+app
 # Copy source code
 COPY . .
 
@@ -22,8 +24,9 @@ RUN printf '#!/bin/sh\n\
     . /app/.env\n\
     set +a\n\
     fi\n\
-    npm run build\n\
-    exec npm start\n' > /app/start.sh && \
+    rm -rf .next\n\
+    pnpm run build\n\
+    exec pnpm start\n' > /app/start.sh && \
     chmod +x /app/start.sh && \
     dos2unix /app/start.sh
 
@@ -32,6 +35,7 @@ EXPOSE 3000
 
 # Set environment variables for production
 ENV NODE_ENV=production
+ENV PATH="/root/.local/share/pnpm:${PATH}"
 
 # Add health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \

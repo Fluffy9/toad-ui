@@ -37,18 +37,18 @@ export function Chat({ messages, input, isLoading, onSubmit, onInputChange }: Ch
                         <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">
                             TOAD
                         </div>
-                        <div className="bg-gray-200 rounded-lg px-4 py-2">
+                        <div className="bg-gray-200 rounded-lg px-4 py-2" data-testid="loading-indicator">
                             <div className="flex space-x-2">
-                                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" />
-                                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce delay-100" />
-                                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce delay-200" />
+                                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" role="status" aria-label="Loading dot 1" />
+                                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce delay-100" role="status" aria-label="Loading dot 2" />
+                                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce delay-200" role="status" aria-label="Loading dot 3" />
                             </div>
                         </div>
                     </div>
                 )}
             </div>
             <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-zinc-900 border-t border-gray-200 dark:border-zinc-800 p-4">
-                <form onSubmit={onSubmit} className="max-w-2xl mx-auto">
+                <form onSubmit={onSubmit} className="max-w-2xl mx-auto" data-testid="chat-form">
                     <input
                         className="w-full p-4 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                         value={input}

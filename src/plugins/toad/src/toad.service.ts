@@ -1,79 +1,54 @@
-import { createPublicClient, http } from 'viem';
-import { optimism, polygon, arbitrum, sepolia } from 'viem/chains';
-import TOAD_ABI from '../../../../public/abi/TOAD.json';
+import { createPublicClient, http, PublicClient } from 'viem';
+import { polygon } from 'viem/chains';
+import { TOAD_ABI } from './abi';
 
-interface ProposalView {
-    tallyId: bigint;
+export interface ProposalView {
+    tallyId: string;
     answer: string;
     reason: string;
-    discoveredAt: bigint;
-    validBlock: bigint;
-    disablePower: bigint;
-    votingPeriod: bigint;
+    discoveredAt: number;
+    validBlock: number;
+    disablePower: number;
+    votingPeriod: number;
     announced: boolean;
 }
 
 export class ToadService {
-    private client: any;
+    private client: PublicClient;
     private contractAddress: `0x${string}`;
 
     constructor(contractAddress: `0x${string}`, chainId: string) {
-        if (!TOAD_ABI?.abi) {
-            throw new Error('TOAD ABI not found. Please ensure public/abi/TOAD.json exists and contains the correct ABI.');
-        }
-
-        if (!contractAddress) {
-            throw new Error('TOAD contract address is required');
-        }
-
+        this.contractAddress = contractAddress;
         const chain = this.getChainById(chainId);
         this.client = createPublicClient({
             chain,
-            transport: http()
+            transport: http(),
+            batch: {
+                multicall: true
+            }
         });
-        this.contractAddress = contractAddress;
     }
 
     private getChainById(chainId: string) {
         switch (chainId) {
-            case '10':
-                return optimism;
             case '137':
                 return polygon;
-            case '42161':
-                return arbitrum;
-            case '11155111':
-                return sepolia;
             default:
-                throw new Error(`Unsupported chain ID: ${chainId}`);
+                return polygon;
         }
     }
 
     async getProposal(tallyId: string): Promise<ProposalView> {
         try {
-            if (!this.client || !this.contractAddress) {
-                throw new Error('TOAD service not properly initialized');
-            }
-
-            const proposal = await this.client.readContract({
+            const data = await this.client.readContract({
                 address: this.contractAddress,
-                abi: TOAD_ABI.abi,
+                abi: TOAD_ABI,
                 functionName: 'getProposal',
                 args: [BigInt(tallyId)]
-            });
-
-            return {
-                tallyId: proposal.tallyId,
-                answer: proposal.answer,
-                reason: proposal.reason,
-                discoveredAt: proposal.discoveredAt,
-                validBlock: proposal.validBlock,
-                disablePower: proposal.disablePower,
-                votingPeriod: proposal.votingPeriod,
-                announced: proposal.announced
-            };
+            }) as unknown as ProposalView;
+            return data;
         } catch (error) {
-            console.error('Error fetching proposal:', error);
+            console.error('Error getting proposal:', error);
             throw error;
         }
     }
@@ -83,7 +58,7 @@ export class ToadService {
             const proposal = await this.getProposal(tallyId);
             return proposal.answer;
         } catch (error) {
-            console.error('Error fetching proposal answer:', error);
+            console.error('Error getting proposal answer:', error);
             throw error;
         }
     }
@@ -93,7 +68,7 @@ export class ToadService {
             const proposal = await this.getProposal(tallyId);
             return proposal.reason;
         } catch (error) {
-            console.error('Error fetching proposal reason:', error);
+            console.error('Error getting proposal reason:', error);
             throw error;
         }
     }
@@ -121,7 +96,7 @@ export class ToadService {
                 announced: proposal.announced
             };
         } catch (error) {
-            console.error('Error fetching proposal details:', error);
+            console.error('Error getting proposal details:', error);
             throw error;
         }
     }

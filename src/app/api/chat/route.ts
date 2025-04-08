@@ -3,12 +3,13 @@ import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
 import { LanguageModelV1, streamText } from 'ai';
 import { tally } from "../../../plugins/tally/src";
 import { discourse } from "../../../plugins/discourse/src";
+import { toad } from "../../../plugins/toad/src";
 import { createWalletClient, http } from "viem";
 import { polygon } from "viem/chains";
 import { getOnChainTools } from "@goat-sdk/adapter-vercel-ai";
 import { viem } from "@goat-sdk/wallet-viem";
 import { privateKeyToAccount } from 'viem/accounts';
-import { apiKeys, config, openaiConfig, discourseConfig, hasRequiredEnvVars } from '@/config/constants';
+import { apiKeys, config, openaiConfig, discourseConfig, hasRequiredEnvVars, contracts } from '@/config/constants';
 import dotenv from 'dotenv'
 dotenv.config()
 
@@ -77,6 +78,10 @@ export async function POST(req: Request) {
             tally({
                 apiKey: apiKeys.tally,
                 organizationName: config.organizationName,
+                chainId: config.chainId,
+            }),
+            toad({
+                contractAddress: contracts.toad,
                 chainId: config.chainId,
             }),
         ],

@@ -4,6 +4,7 @@ import { optimism, polygon, arbitrum, sepolia } from 'wagmi/chains';
 import TOAD_ABI from '../../public/abi/TOAD.json';
 import ReactMarkdown from 'react-markdown';
 import { contracts } from '../config/constants';
+import React from 'react';
 
 const welcomeMessage = `# Welcome to TOAD 🐸
 
@@ -30,7 +31,7 @@ export function MemberGate({ children }: { children: React.ReactNode }) {
     const { address, isConnected } = useAccount();
     const chainId = useChainId();
 
-    const { data: isMember } = useReadContract({
+    const { data: isMember, isLoading, error } = useReadContract({
         address: contracts.toad,
         abi: TOAD_ABI.abi,
         functionName: 'isMember',
@@ -40,12 +41,18 @@ export function MemberGate({ children }: { children: React.ReactNode }) {
         }
     });
 
+    // Log contract read failures
+    React.useEffect(() => {
+        if (error && !error.message.includes('revert')) {
+            console.error('Contract read failed:', error);
+        }
+    }, [error]);
+
     const supportedNetworks = [optimism, polygon, arbitrum, sepolia];
     const isSupportedNetwork = supportedNetworks.some(chain => chain.id === chainId);
 
     // Check for required environment variables after all hooks
     if (!contracts.toad) {
-        console.error('Required environment variables are not set');
         return (
             <div className="flex flex-col items-center justify-center min-h-[400px] p-6 text-center">
                 <h2 className="text-2xl font-bold mb-4">Configuration Error</h2>
@@ -84,6 +91,28 @@ export function MemberGate({ children }: { children: React.ReactNode }) {
                         <li>Sepolia (Testnet)</li>
                     </ul>
                 </div>
+            </div>
+        );
+    }
+
+    if (isLoading) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[400px] p-6 text-center">
+                <h2 className="text-2xl font-bold mb-4">Loading...</h2>
+                <p className="text-gray-600 dark:text-gray-400">
+                    Checking your membership status...
+                </p>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[400px] p-6 text-center">
+                <h2 className="text-2xl font-bold mb-4">Error</h2>
+                <p className="text-gray-600 dark:text-gray-400">
+                    Failed to check membership status. Please try again.
+                </p>
             </div>
         );
     }

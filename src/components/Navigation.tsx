@@ -9,12 +9,28 @@ interface NavigationProps {
     onDelegateVotes?: (address: string) => void;
 }
 
+const ConnectButtonSkeleton = () => (
+    <div className="animate-pulse">
+        <div className="h-10 w-32 rounded-lg bg-gray-200 dark:bg-zinc-800" />
+    </div>
+);
+
 export const Navigation = ({ onDelegateVotes }: NavigationProps) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [showDisableToad, setShowDisableToad] = useState(false);
-    const { address, isConnected } = useAccount();
+    const [isConnectButtonLoading, setIsConnectButtonLoading] = useState(true);
+    const { address, isConnected, status } = useAccount();
     const { delegateVotes } = useGovernance();
+
+    // Update loading state based on connection status
+    React.useEffect(() => {
+        if (status === 'connecting' || status === 'reconnecting') {
+            setIsConnectButtonLoading(true);
+        } else {
+            setIsConnectButtonLoading(false);
+        }
+    }, [status]);
 
     // Check membership status
     const { data: isMember } = useReadContract({
@@ -216,7 +232,11 @@ export const Navigation = ({ onDelegateVotes }: NavigationProps) => {
 
                 {/* Connect Button */}
                 <div className="hidden sm:flex items-center space-x-4">
-                    <ConnectButton />
+                    {isConnectButtonLoading ? (
+                        <ConnectButtonSkeleton />
+                    ) : (
+                        <ConnectButton />
+                    )}
                 </div>
             </nav>
 
@@ -224,8 +244,7 @@ export const Navigation = ({ onDelegateVotes }: NavigationProps) => {
             {showDisableToad && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
                     <div className="bg-white dark:bg-zinc-900 rounded-lg p-6 max-w-md w-full mx-4">
-                        <DisableToad 
-                            tallyIds={[1, 2, 3]} // You'll need to provide the actual tally IDs
+                        <DisableToad
                             onComplete={() => {
                                 setShowDisableToad(false);
                                 // Add any additional completion logic here

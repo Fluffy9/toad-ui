@@ -1,91 +1,29 @@
-import { optimism, polygon, arbitrum, sepolia } from 'wagmi/chains';
-import { useChainId, useSwitchChain } from 'wagmi';
-import { useState } from 'react';
-
-const chainLogos = {
-    [optimism.id]: (
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="rgb(255, 4, 32)" />
-            <path d="M2 17L12 22L22 17" stroke="rgb(255, 4, 32)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M2 12L12 17L22 12" stroke="rgb(255, 4, 32)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-    ),
-    [polygon.id]: (
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="rgb(130, 71, 229)" />
-            <path d="M2 17L12 22L22 17" stroke="rgb(130, 71, 229)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M2 12L12 17L22 12" stroke="rgb(130, 71, 229)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-    ),
-    [arbitrum.id]: (
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="rgb(40, 160, 240)" />
-            <path d="M2 17L12 22L22 17" stroke="rgb(40, 160, 240)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M2 12L12 17L22 12" stroke="rgb(40, 160, 240)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-    ),
-    [sepolia.id]: (
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="rgb(128, 128, 128)" />
-            <path d="M2 17L12 22L22 17" stroke="rgb(128, 128, 128)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M2 12L12 17L22 12" stroke="rgb(128, 128, 128)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-    ),
-};
-
-const supportedChains = [optimism, polygon, arbitrum, sepolia];
+import { useChainId } from 'wagmi';
+import { supportedChains } from '@/config/chains';
 
 export function ChainSelector() {
-    const [isOpen, setIsOpen] = useState(false);
     const chainId = useChainId();
-    const { switchChain } = useSwitchChain();
     const isSupported = supportedChains.some(chain => chain.id === chainId);
-    const currentChain = supportedChains.find(chain => chain.id === chainId) || optimism;
+    const currentChain = supportedChains.find(chain => chain.id === chainId) || supportedChains[0];
+
+    if (!currentChain) {
+        return <div>No supported chains configured</div>;
+    }
 
     return (
-        <div className="relative">
-            <button
-                onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center space-x-2 px-3 py-2 rounded-md bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 transition-colors"
-            >
-                {isSupported ? chainLogos[currentChain.id] : (
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="rgb(255, 0, 0)" />
-                        <path d="M2 17L12 22L22 17" stroke="rgb(255, 0, 0)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                        <path d="M2 12L12 17L22 12" stroke="rgb(255, 0, 0)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                )}
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
-                    {isSupported ? currentChain.name : 'Unsupported Network'}
-                </span>
-                <svg
-                    className={`w-4 h-4 text-gray-500 dark:text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-            </button>
-
-            {isOpen && (
-                <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-zinc-900 ring-1 ring-black ring-opacity-5 dark:ring-white dark:ring-opacity-10">
-                    <div className="py-1" role="menu" aria-orientation="vertical">
+        <div>
+            {isSupported ? (
+                <div>
+                    <span>Connected to {currentChain.name}</span>
+                </div>
+            ) : (
+                <div>
+                    <span>Unsupported chain. Please switch to one of:</span>
+                    <ul>
                         {supportedChains.map((chain) => (
-                            <button
-                                key={chain.id}
-                                onClick={() => {
-                                    switchChain({ chainId: chain.id });
-                                    setIsOpen(false);
-                                }}
-                                className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 flex items-center space-x-2"
-                                role="menuitem"
-                            >
-                                {chainLogos[chain.id]}
-                                <span>{chain.name}</span>
-                            </button>
+                            <li key={chain.id}>{chain.name}</li>
                         ))}
-                    </div>
+                    </ul>
                 </div>
             )}
         </div>

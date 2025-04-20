@@ -51,9 +51,13 @@ jest.mock('wagmi', () => ({
         writeContract: jest.fn(),
     }),
     useReadContract: () => ({
-        data: '0x456',
+        data: true,
+        isLoading: false,
+        error: null,
+        refetch: jest.fn(),
     }),
     useChainId: () => 1,
+    useWatchContractEvent: () => jest.fn(),
 }));
 
 jest.mock('wagmi/chains', () => ({
@@ -80,29 +84,6 @@ describe('MemberGate', () => {
         jest.clearAllMocks();
     });
 
-    describe('Unconnected State', () => {
-        it('should show welcome info when user is not connected', () => {
-            // Mock useAccount to return unconnected state
-            jest.spyOn(require('wagmi'), 'useAccount').mockImplementation(() => ({
-                isConnected: false,
-                address: undefined,
-            }));
-
-            render(<MemberGate><div>Test Content</div></MemberGate>);
-
-            // Check for welcome elements
-            expect(screen.getByText(/welcome to toad/i)).toBeInTheDocument();
-            expect(screen.getByText(/ai-powered voting delegate system/i)).toBeInTheDocument();
-            expect(screen.getByText(/connect your wallet using one of the supported wallets below/i)).toBeInTheDocument();
-            expect(screen.getByText(/make sure you're on a supported network/i)).toBeInTheDocument();
-            expect(screen.getByText(/delegate your voting power to yourself/i)).toBeInTheDocument();
-
-            // Ensure membership section is not shown
-            expect(screen.queryByText(/toad membership required/i)).not.toBeInTheDocument();
-            // Ensure chat interface is not shown
-            expect(screen.queryByText('Test Content')).not.toBeInTheDocument();
-        });
-    });
 
     describe('Non-Member State', () => {
         it('should show membership required section when user is connected but not a member', () => {
@@ -120,6 +101,7 @@ describe('MemberGate', () => {
                 data: false,
                 isLoading: false,
                 error: null,
+                refetch: jest.fn(),
             }));
 
             render(<MemberGate><div>Test Content</div></MemberGate>);
@@ -153,6 +135,7 @@ describe('MemberGate', () => {
                 data: null,
                 isLoading: false,
                 error: new Error('Contract reverted'),
+                refetch: jest.fn(),
             }));
 
             render(<MemberGate><div>Test Content</div></MemberGate>);
@@ -184,6 +167,7 @@ describe('MemberGate', () => {
                 data: true,
                 isLoading: false,
                 error: null,
+                refetch: jest.fn(),
             }));
 
             render(<MemberGate><div>Test Content</div></MemberGate>);
@@ -214,6 +198,7 @@ describe('MemberGate', () => {
                 data: null,
                 isLoading: false,
                 error: new Error('Failed to read contract'),
+                refetch: jest.fn(),
             }));
 
             render(<MemberGate><div>Test Content</div></MemberGate>);

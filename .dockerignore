@@ -6,6 +6,7 @@ node_modules
 # Testing
 coverage
 src/utils/wallet.ts
+src/components/__tests__/*
 
 # Next.js
 .next

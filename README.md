@@ -1,6 +1,6 @@
 # TOAD UI
 
-TOAD (Trustless Onchain Autonomous Delegate) is an AI-powered voting delegate system. This repo contains the UI and AI agent. The UI is built with Vercel AI SDK and the AI agent uses GOAT. GAIA is used for the LLM
+TOAD (Trustless Onchain Autonomous Delegate) is an AI-powered voting delegate system. This repo contains the UI and AI agent. The UI is built with Vercel AI SDK and the AI agent uses GOAT. 
 
 ## Development
 

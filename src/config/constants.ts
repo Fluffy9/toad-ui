@@ -4,6 +4,7 @@
 export const contracts = {
     toad: process.env.NEXT_PUBLIC_TOAD_CONTRACT_ADDRESS as `0x${string}`,
     governance: process.env.NEXT_PUBLIC_GOVERNANCE_TOKEN_ADDRESS as `0x${string}`,
+    multicall: process.env.MULTICALL_ADDRESS as `0x${string}`,
 } as const;
 
 // API Keys and Secrets
@@ -14,9 +15,12 @@ export const apiKeys = {
     walletConnect: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID as string,
 } as const;
 
+// Debug logging
+console.log('WalletConnect Project ID:', process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID);
+
 // Organization and Chain Configuration
 export const config = {
-    organizationName: process.env.GOVERNANCE_ORGANIZATION_NAME as string,
+    organizationName: process.env.NEXT_PUBLIC_GOVERNANCE_ORGANIZATION_NAME as string,
     organizationDescription: process.env.ORGANIZATION_DESCRIPTION as string,
     chainId: process.env.CHAIN_ID as string,
     rpcProviderUrl: process.env.RPC_PROVIDER_URL as string,
@@ -43,7 +47,7 @@ export const discourseConfig = {
 
 // URLs and External Services
 export const urls = {
-    tally: `https://www.tally.xyz/gov/${process.env.GOVERNANCE_ORGANIZATION_NAME}`,
+    tally: `https://www.tally.xyz/gov/${process.env.NEXT_PUBLIC_GOVERNANCE_ORGANIZATION_NAME}`,
     discourse: process.env.NEXT_PUBLIC_DISCOURSE_BASE_URL,
 } as const;
 
@@ -53,7 +57,7 @@ export const hasRequiredEnvVars = () => {
         'NEXT_PUBLIC_TOAD_CONTRACT_ADDRESS',
         'NEXT_PUBLIC_GOVERNANCE_TOKEN_ADDRESS',
         'TALLY_API_KEY',
-        'GOVERNANCE_ORGANIZATION_NAME',
+        'NEXT_PUBLIC_GOVERNANCE_ORGANIZATION_NAME',
         'CHAIN_ID',
         'RPC_URL',
         'WALLET_PRIVATE_KEY',
@@ -71,5 +75,5 @@ export const hasRequiredEnvVars = () => {
     }
 
     return true;
-}; 
+};
 

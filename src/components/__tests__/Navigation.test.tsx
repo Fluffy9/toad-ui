@@ -6,18 +6,17 @@ import { Navigation } from '../Navigation';
 process.env.NEXT_PUBLIC_GOVERNANCE_ORGANIZATION_NAME = 'test';
 process.env.NEXT_PUBLIC_GOVERNANCE_TOKEN_ADDRESS = '0x1234567890123456789012345678901234567890';
 process.env.NEXT_PUBLIC_TOAD_CONTRACT_ADDRESS = '0x0987654321098765432109876543210987654321';
-process.env.TALLY_API_KEY = 'https://www.tally.xyz/gov/test';
-process.env.NEXT_PUBLIC_DISCOURSE_BASE_URL = 'https://forum.example.com';
+process.env.TALLY_API_KEY = '1234567890';
 process.env.CHAIN_ID = '1';
 process.env.RPC_PROVIDER_URL = 'https://mainnet.infura.io/v3/test';
 process.env.WALLET_PRIVATE_KEY = '0x1234567890123456789012345678901234567890123456789012345678901234';
 process.env.OPENAI_API_KEY = 'test-openai-key';
-process.env.DISCOURSE_BASE_URL = 'https://forum.example.com';
+process.env.NEXT_PUBLIC_DISCOURSE_BASE_URL = 'https://forum.example.com';
 
 // Mock the constants file
 jest.mock('@/config/constants', () => ({
     urls: {
-        tally: 'https://www.tally.xyz/gov/test-org',
+        tally: 'https://www.tally.xyz/gov/test',
         discourse: 'https://forum.example.com',
     },
     contracts: {
@@ -31,7 +30,7 @@ jest.mock('@/config/constants', () => ({
         walletPrivateKey: '0x1234567890123456789012345678901234567890123456789012345678901234',
     },
     apiKeys: {
-        tally: 'https://www.tally.xyz/gov/test',
+        tally: '1234567890',
         openai: 'test-openai-key',
         discourse: 'test-discourse-key',
         walletConnect: 'test-wallet-connect-id',
@@ -48,11 +47,22 @@ jest.mock('wagmi', () => ({
         isConnected: true,
     }),
     useWriteContract: () => ({
-        writeContract: jest.fn(),
+        writeContractAsync: jest.fn().mockResolvedValue('0x123'),
     }),
     useReadContract: () => ({
         data: '0x456',
     }),
+}));
+
+jest.mock('wagmi/actions', () => ({
+    waitForTransactionReceipt: jest.fn().mockResolvedValue({ status: 'success' }),
+}));
+
+jest.mock('wagmi/chains', () => ({
+    optimism: { id: 10 },
+    polygon: { id: 137 },
+    arbitrum: { id: 42161 },
+    sepolia: { id: 11155111 },
 }));
 
 describe('Navigation', () => {
@@ -73,7 +83,7 @@ describe('Navigation', () => {
             const desktopMenu = screen.getByRole('menu');
             const tallyLink = within(desktopMenu).getByRole('menuitem', { name: /view on tally/i });
             expect(tallyLink).toBeInTheDocument();
-            expect(tallyLink).toHaveAttribute('href', 'https://www.tally.xyz/gov/test-org');
+            expect(tallyLink).toHaveAttribute('href', 'https://www.tally.xyz/gov/test');
         });
 
         it('should have a "Forum" link that points to Discourse', () => {
@@ -87,7 +97,7 @@ describe('Navigation', () => {
             const desktopMenu = screen.getByRole('menu');
             const forumLink = within(desktopMenu).getByRole('menuitem', { name: /forum/i });
             expect(forumLink).toBeInTheDocument();
-            expect(forumLink).toHaveAttribute('href', 'https://forum.example.com');
+            expect(forumLink).toHaveAttribute('href', `${process.env.NEXT_PUBLIC_DISCOURSE_BASE_URL}`);
         });
 
         describe('Membership Status', () => {
@@ -217,7 +227,7 @@ describe('Navigation', () => {
             const mobileMenu = screen.getByRole('menu');
             const tallyLink = within(mobileMenu).getByRole('menuitem', { name: /view on tally/i });
             expect(tallyLink).toBeInTheDocument();
-            expect(tallyLink).toHaveAttribute('href', 'https://www.tally.xyz/gov/test-org');
+            expect(tallyLink).toHaveAttribute('href', `https://www.tally.xyz/gov/${process.env.NEXT_PUBLIC_GOVERNANCE_ORGANIZATION_NAME}`);
         });
 
         it('should have a "Forum" link that points to Discourse', () => {
@@ -231,7 +241,7 @@ describe('Navigation', () => {
             const mobileMenu = screen.getByRole('menu');
             const forumLink = within(mobileMenu).getByRole('menuitem', { name: /forum/i });
             expect(forumLink).toBeInTheDocument();
-            expect(forumLink).toHaveAttribute('href', 'https://forum.example.com');
+            expect(forumLink).toHaveAttribute('href', `${process.env.NEXT_PUBLIC_DISCOURSE_BASE_URL}`);
         });
 
         describe('Membership Status', () => {

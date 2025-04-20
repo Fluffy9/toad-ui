@@ -1,37 +1,17 @@
-import { useAccount, useReadContract } from 'wagmi';
-import { useChainId } from 'wagmi';
-import { optimism, polygon, arbitrum, sepolia } from 'wagmi/chains';
-import TOAD_ABI from '../../public/abi/TOAD.json';
-import ReactMarkdown from 'react-markdown';
+import { useAccount, useReadContract, useChainId, useWatchContractEvent } from 'wagmi';
+import { supportedChains } from '@/config/chains';
 import { contracts } from '../config/constants';
+import TOAD_ABI from '../../public/abi/TOAD.json';
+import ERC20Votes_ABI from '../../public/abi/ERC20Votes.json';
 import React from 'react';
 
-const welcomeMessage = `# Welcome to TOAD 🐸
-
-TOAD is an AI-powered voting delegate system that helps you participate in governance more effectively. Our system analyzes proposals and votes on your behalf based on your preferences.
-
-## Getting Started
-
-1. Connect your wallet using one of the supported wallets below
-2. Make sure you're on a supported network (Optimism, Polygon, Arbitrum, or Sepolia)
-3. Delegate your voting power to yourself to start participating in governance
-
-## Supported Networks
-
-- Optimism
-- Polygon
-- Arbitrum
-- Sepolia
-
-## Need Help?
-
-If you're having trouble connecting your wallet or need assistance with delegation, please check our documentation or reach out to our community.`;
 
 export function MemberGate({ children }: { children: React.ReactNode }) {
-    const { address, isConnected } = useAccount();
+    const { address } = useAccount();
     const chainId = useChainId();
+    const isSupported = supportedChains.some(chain => chain.id === chainId);
 
-    const { data: isMember, isLoading, error } = useReadContract({
+    const { data: isMember, isLoading, error, refetch } = useReadContract({
         address: contracts.toad,
         abi: TOAD_ABI.abi,
         functionName: 'isMember',
@@ -41,6 +21,19 @@ export function MemberGate({ children }: { children: React.ReactNode }) {
         }
     });
 
+    // Watch for delegation events
+    useWatchContractEvent({
+        address: contracts.governance,
+        abi: ERC20Votes_ABI.abi,
+        eventName: 'DelegateChanged',
+        onLogs: () => {
+            // Wait 5 minutes before refreshing isMember check
+            setTimeout(() => {
+                refetch();
+            }, 5 * 60 * 1000); // 5 minutes in milliseconds
+        },
+    });
+
     // Log contract read failures
     React.useEffect(() => {
         if (error && !error.message.includes('revert')) {
@@ -48,36 +41,22 @@ export function MemberGate({ children }: { children: React.ReactNode }) {
         }
     }, [error]);
 
-    const supportedNetworks = [optimism, polygon, arbitrum, sepolia];
-    const isSupportedNetwork = supportedNetworks.some(chain => chain.id === chainId);
-
-    // Check for required environment variables after all hooks
-    if (!contracts.toad) {
+    if (!address) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[400px] p-6 text-center">
-                <h2 className="text-2xl font-bold mb-4">Configuration Error</h2>
+                <h2 className="text-2xl font-bold mb-4">Please Connect Your Wallet</h2>
                 <p className="text-gray-600 dark:text-gray-400">
-                    The application is not properly configured. Please check your environment variables.
+                    Please connect your wallet to access this content.
                 </p>
             </div>
         );
     }
 
-    if (!isConnected) {
+    if (!isSupported) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[400px] p-6 text-center">
-                <div className="max-w-2xl prose dark:prose-invert">
-                    <ReactMarkdown>{welcomeMessage}</ReactMarkdown>
-                </div>
-            </div>
-        );
-    }
-
-    if (!isSupportedNetwork) {
-        return (
-            <div className="flex flex-col items-center justify-center min-h-[400px] p-6 text-center">
-                <h2 className="text-2xl font-bold mb-4">Unsupported Network</h2>
-                <p className="text-gray-600 dark:text-gray-400 mb-6">
+                <h2 className="text-2xl font-bold mb-4">Please Switch to a Supported Chain</h2>
+                <p className="text-gray-600 dark:text-gray-400">
                     Please switch to a supported network to access this content.
                 </p>
                 <div className="space-y-4">
@@ -85,10 +64,9 @@ export function MemberGate({ children }: { children: React.ReactNode }) {
                         Supported networks:
                     </p>
                     <ul className="list-disc list-inside text-sm text-gray-500 dark:text-gray-400 space-y-2">
-                        <li>Optimism</li>
-                        <li>Polygon</li>
-                        <li>Arbitrum</li>
-                        <li>Sepolia (Testnet)</li>
+                        {supportedChains.map(chain => (
+                            <li key={chain.id}>{chain.name}</li>
+                        ))}
                     </ul>
                 </div>
             </div>
